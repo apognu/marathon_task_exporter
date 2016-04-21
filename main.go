@@ -68,7 +68,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 
 	e.taskCount.Reset()
 	for t, m := range metrics {
-		t = strings.Join(reverseTaskName(strings.Split(t, "/")), ".")
+		t = strings.Join(reverseTaskName(strings.Split(t, "/")[1:]), ".")
 		e.taskCount.
 			With(prometheus.Labels{"task": t}).
 			Set(float64(m.Count))
