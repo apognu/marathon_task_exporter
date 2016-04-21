@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -67,6 +68,7 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 
 	e.taskCount.Reset()
 	for t, m := range metrics {
+		t = strings.Join(reverseTaskName(strings.Split(t, "/")), ".")
 		e.taskCount.
 			With(prometheus.Labels{"task": t}).
 			Set(float64(m.Count))
@@ -90,6 +92,17 @@ func main() {
 	exporter := NewExporter(*marathonURL)
 	prometheus.MustRegister(exporter)
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Location", "/metrics")
+		w.WriteHeader(http.StatusTemporaryRedirect)
+	})
 	http.Handle(*metricsPath, prometheus.Handler())
 	log.Fatal(http.ListenAndServe(*bindAddress, nil))
+}
+
+func reverseTaskName(input []string) []string {
+	if len(input) == 0 {
+		return input
+	}
+	return append(reverseTaskName(input[1:]), input[0])
 }

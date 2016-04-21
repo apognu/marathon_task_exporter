@@ -7,10 +7,12 @@ This exporter is not meant to report low-level metrics on Marathon. If you are l
 ## Example output
 
 ```
-marathon_task_count{task="/production/app-01"} 10
-marathon_task_count{task="/production/app-02"} 3
-marathon_task_count{task="/staging/app-03"} 0
+marathon_task_count{task="app-01.production"} 10
+marathon_task_count{task="app-02.production"} 3
+marathon_task_count{task="app-03.staging"} 0
 ```
+
+**Note :** the task name format was taken from the Mesos exporter for consistency. If you have an app in _/cluster/production/app-01_, it will be reported as _app-01.production.cluster_.
 
 ## Build
 
